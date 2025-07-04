@@ -19,6 +19,7 @@ struct _items
     GtkWidget *start_button;
     GtkWidget *xevent_switch;
     GtkWidget *reset_preset_button;
+    GtkWidget *keep_above_all_button;
 } items;
 
 struct set_buttons_entry_struct
@@ -136,6 +137,21 @@ void xevent_switch_changed(GtkSwitch *self, gboolean state)
     gtk_switch_set_active(self, state);
 }
 
+void keep_above_switch_changed(GtkSwitch *self, gboolean state)
+{
+    g_key_file_set_boolean(config_gfile, CFGK_KEEP_ABOVE_ALL, state);
+
+    GtkWidget *dialog = gtk_widget_get_toplevel(self);
+    if (GTK_IS_WINDOW(dialog))
+    {
+        GtkWindow *win = gtk_window_get_transient_for(dialog);
+        gtk_window_set_keep_above(win, state);
+    }
+
+    save_and_populate_config();
+    gtk_switch_set_active(self, state);
+}
+
 void start_button_pressed(GtkButton *self)
 {
     isChoosingHotkey = TRUE;
@@ -154,10 +170,11 @@ void reset_preset_button_pressed()
     mainappwindow_import_config();
 }
 
-void settings_dialog_new()
+void settings_dialog_new(GtkWindow *parent)
 {
     GtkBuilder *builder = gtk_builder_new_from_resource("/res/ui/settings-dialog.ui");
     GtkDialog *dialog = GTK_DIALOG(gtk_builder_get_object(builder, "dialog"));
+    gtk_window_set_transient_for(dialog, parent);
 
     config_read_from_file();
 
@@ -165,6 +182,7 @@ void settings_dialog_new()
 
     gtk_builder_add_callback_symbol(builder, "safe_mode_changed", safe_mode_changed);
     gtk_builder_add_callback_symbol(builder, "xevent_switch_changed", xevent_switch_changed);
+    gtk_builder_add_callback_symbol(builder, "keep_above_switch_changed", keep_above_switch_changed);
     gtk_builder_add_callback_symbol(builder, "start_button_pressed", start_button_pressed);
     gtk_builder_add_callback_symbol(builder, "reset_preset_button_pressed", reset_preset_button_pressed);
 
@@ -177,10 +195,12 @@ void settings_dialog_new()
     items.buttons_entry = gtk_builder_get_object(builder, "buttons_entry");
     items.start_button = gtk_builder_get_object(builder, "start_button");
     items.xevent_switch = gtk_builder_get_object(builder, "xevent_switch");
+    items.keep_above_all_button = gtk_builder_get_object(builder, "keep_above_switch");
 
     // Load
     gtk_switch_set_active(GTK_SWITCH(gtk_builder_get_object(builder, "safe_mode_switch")), is_safemode());
     gtk_switch_set_active(GTK_SWITCH(items.xevent_switch), config->use_xevent);
+    gtk_switch_set_active(GTK_SWITCH(items.keep_above_all_button), config->keep_above_all);
 
     // Load hotkeys
     Display *display = get_display();

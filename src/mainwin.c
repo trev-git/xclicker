@@ -495,9 +495,9 @@ void mainappwindow_import_config()
 	gtk_entry_set_text_if_not_null(mainappwindow.holdtime_type_entry, config->holdtime_type);
 }
 
-void settings_clicked()
+void settings_clicked(GtkButton *button)
 {
-	settings_dialog_new();
+	settings_dialog_new(gtk_widget_get_toplevel(button));
 }
 
 void get_button_clicked()
@@ -725,6 +725,8 @@ static void main_app_window_init(MainAppWindow *win)
 	mainappwindow.stop_button = win->stop_button;
 	mainappwindow.settings_button = win->settings_button;
 	mainappwindow.get_button = win->get_button;
+
+	gtk_window_set_keep_above(win, config->keep_above_all);
 
 	set_start_stop_button_hotkey_text();
 	mainappwindow_import_config();
