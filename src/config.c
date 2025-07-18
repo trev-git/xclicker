@@ -94,7 +94,7 @@ struct Config *config_read_from_file()
 
     config->safe_mode_enabled = g_key_file_get_boolean(config_gfile, CFGK_SAFEMODE, NULL);
     config->use_xevent = g_key_file_get_boolean(config_gfile, CFGK_USE_XEVENT, NULL);
-
+    config->keep_above_all = g_key_file_get_boolean(config_gfile, CFGK_KEEP_ABOVE_ALL, NULL);
     config->hours = g_key_file_get_string(config_gfile, PCK_HOURS, NULL);
     config->minutes = g_key_file_get_string(config_gfile, PCK_MINUTES, NULL);
     config->seconds = g_key_file_get_string(config_gfile, PCK_SECONDS, NULL);

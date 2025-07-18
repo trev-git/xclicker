@@ -6,6 +6,6 @@ extern gboolean isChoosingHotkey;
 /**
  * Opens up a new settings dialog.
  */
-void settings_dialog_new();
+void settings_dialog_new(GtkWindow *parent);
 
 #endif
